@@ -1,0 +1,38 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+body {
+  /* Prefer system UI fonts for better availability and to avoid external font fetches */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global layout containment rules */
+app-layout {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Ensure all content within app-layout is properly contained */
+app-layout * {
+  box-sizing: border-box;
+}
+
+/* Override any conflicting height constraints */
+app-layout [style*="height: 100vh"],
+app-layout [style*="min-height: 100vh"] {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+}
+
+@import "../node_modules/@ng-select/ng-select/themes/material.theme.css";
