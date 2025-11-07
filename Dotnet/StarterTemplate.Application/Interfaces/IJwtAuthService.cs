@@ -65,5 +65,19 @@ namespace StarterTemplate.Application.Interfaces
         /// <param name="refreshToken">The refresh token to validate.</param>
         /// <returns>True if the refresh token is valid; otherwise, false.</returns>
         Task<bool> ValidateRefreshTokenAsync(string refreshToken);
+
+        /// <summary>
+        /// Sends a password reset link to the specified email address.
+        /// </summary>
+        /// <param name="email">The email address of the user requesting the password reset.</param>
+        /// <returns>A task that represents the asynchronous operation, with a boolean result indicating success or failure.</returns>
+        Task<bool> SendPasswordResetLinkAsync(string email);
+        
+        /// <summary>
+        /// Resets the user's password using the provided reset token and new password.
+        /// </summary>
+        /// <param name="resetPasswordDto">The DTO containing the reset password information.</param>
+        /// <returns>A task that represents the asynchronous operation, with a ValidationResultDto indicating success or failure.</returns>
+        Task<ValidationResultDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     }
 }
