@@ -26,6 +26,8 @@ namespace StarterTemplate.Application
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<IValidationService, ValidationService>();
+            services.AddScoped<JwtAuthService>();
+            services.AddScoped<EmailService>();
 
             // Register core mappers
             services.AddScoped<NotificationMapper>();
