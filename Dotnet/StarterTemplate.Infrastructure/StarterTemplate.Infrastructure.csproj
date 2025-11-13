@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StarterTemplate.Application\StarterTemplate.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Repositories\Legacy\**" />
+    <EmbeddedResource Remove="Repositories\Legacy\**" />
+    <None Remove="Repositories\Legacy\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Legacy\**" />
+    <EmbeddedResource Remove="Data\Legacy\**" />
+    <None Remove="Data\Legacy\**" />
+  </ItemGroup>
+
+</Project> 
