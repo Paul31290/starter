@@ -9,7 +9,9 @@ import {
   AuthResponse, 
   RefreshTokenRequest, 
   AuthUser, 
-  TokenValidationResponse 
+  TokenValidationResponse,
+  ForgotPasswordRequest, 
+  ResetPasswordRequest
 } from '../models/auth.model';
 
 @Injectable({
@@ -214,4 +216,14 @@ export class AuthService {
     const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
     return expiration.getTime() - Date.now() < fiveMinutes;
   }
-}
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<any> {
+    this.setLoading(true);
+    return this.http.post<AuthResponse>(`${this.baseUrl}/forgot-password`, request)
+  }
+
+  public resetPassword(request: ResetPasswordRequest) : Observable<any> {
+    this.setLoading(true);
+    return this.http.post<AuthResponse>(`${this.baseUrl}/reset-password`, request);
+  }
+} 
