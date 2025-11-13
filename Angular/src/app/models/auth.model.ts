@@ -46,3 +46,14 @@ export interface TokenValidationResponse {
   roles: string[];
   isValid: boolean;
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  confirmPassword: string;
+  email: string;
+  token: string;
+}

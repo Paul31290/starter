@@ -216,7 +216,7 @@ namespace StarterTemplate.Api.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    return Ok(forgotPasswordDto);
+                    return BadRequest(ModelState);
                 var emailResult = await _jwtAuthService.SendPasswordResetLinkAsync(forgotPasswordDto.Email);
                 // Always show confirmation view (don’t reveal if email exists)
                 return Ok(emailResult);
@@ -260,7 +260,7 @@ namespace StarterTemplate.Api.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    return Ok(resetPasswordDto);
+                    return BadRequest(ModelState);
                 var result = await _jwtAuthService.ResetPasswordAsync(resetPasswordDto);
                 if (result.IsValid)
                     return Ok(result);
