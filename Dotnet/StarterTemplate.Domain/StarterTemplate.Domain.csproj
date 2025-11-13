@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Entities\Legacy\**" />
+    <EmbeddedResource Remove="Entities\Legacy\**" />
+    <None Remove="Entities\Legacy\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Constants\Enums\Legacy\**" />
+    <EmbeddedResource Remove="Constants\Enums\Legacy\**" />
+    <None Remove="Constants\Enums\Legacy\**" />
+  </ItemGroup>
+
+</Project> 

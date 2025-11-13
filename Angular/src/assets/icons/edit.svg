@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Pencil icon (replaces previous edit icon) -->
+  <path d="M3 21v-3a2 2 0 0 1 .6-1.4L16.6 3.6a2 2 0 0 1 2.8 0l1 1a2 2 0 0 1 0 2.8L7.4 21.4A2 2 0 0 1 6 22H3z" />
+  <path d="M14.5 5.5l4 4" />
+</svg>

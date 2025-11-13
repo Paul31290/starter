@@ -1,0 +1,21 @@
+<app-generic-table
+  [config]="tableConfig"
+  [dataSource]="dataSource"
+  [loading]="loading"
+  [error]="error"
+  [totalCount]="totalCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  searchPlaceholder="Search by name, email, or username"
+  noDataMessage="No users found"
+  noDataIcon="people_outline"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (searchChange)="onSearchChange($event)"
+  (filterChange)="onFilterChange($event)"
+  (refresh)="onRefresh()"
+  (export)="onExport()"
+  (actionClick)="onActionClick($event)"
+  (bulkActionClick)="onBulkActionClick($event)"
+  (selectionChange)="onSelectionChange($event)">
+</app-generic-table>
