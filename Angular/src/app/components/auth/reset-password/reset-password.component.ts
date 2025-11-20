@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { Component, OnInit } from '@angular/core';
@@ -35,10 +35,10 @@ export class ResetPasswordComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,) {
             this.resetPasswordForm = this.formBuilder.group({
-            email: ['', [Validators.required,]],
-            password: ['', [Validators.required]],
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)]],
             confirm: ['', [Validators.required]],
-        });
+        }, { validators: this.passwordMatchValidator });
     }
 
     ngOnInit(): void {
@@ -94,12 +94,29 @@ export class ResetPasswordComponent implements OnInit {
         const control = this.resetPasswordForm.get(fieldName);
         if (control?.errors && control.touched) {
         if (control.errors['required']) {
-            return `${this.getFieldLabel(fieldName)} is required.`;
+          return `${this.getFieldLabel(fieldName)} is required.`;
         }
-        if(control.errors['mustMatch']) {
-            return `${this.getFieldLabel('confirm')} does not match ${this.getFieldLabel('password')}.`;
+        if (control.errors['minlength']) {
+          return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['minlength'].requiredLength} characters.`;
         }
-    }
+        if (control.errors['maxlength']) {
+          return `${this.getFieldLabel(fieldName)} cannot exceed ${control.errors['maxlength'].requiredLength} characters.`;
+        }
+        if (control.errors['email']) {
+          return 'Please enter a valid email address.';
+        }
+        if (control.errors['pattern']) {
+          if (fieldName === 'userName') {
+            return 'Username can only contain letters, numbers, and underscores.';
+          }
+          if (fieldName === 'password') {
+            return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.';
+          }
+        }
+        if (control.errors['passwordMismatch']) {
+          return 'Passwords do not match.';
+        }
+      }
     return '';
     }
 
@@ -107,7 +124,23 @@ export class ResetPasswordComponent implements OnInit {
         const control = this.resetPasswordForm.get(fieldName);
         return !!(control?.invalid && control.touched);
     }
+
+    passwordMatchValidator(control: AbstractControl): { [key: string]: any } | null {
+      const password = control.get('password');
+      const confirmPassword = control.get('confirmPassword');
+
+      if (password && confirmPassword && password.value !== confirmPassword.value) {
+        return { passwordMismatch: true };
+      }
+      return null;
+    }
+
+    hasPasswordMismatch(): boolean {
+      return !!(this.resetPasswordForm.hasError('passwordMismatch') &&
+      this.resetPasswordForm.get('confirmPassword')?.touched);
+    }
     
+  
     private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
       'email': 'Email',

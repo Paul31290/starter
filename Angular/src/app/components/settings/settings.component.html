@@ -1,0 +1,75 @@
+<div class="settings-container">
+    <div class="settings-card">
+        <div class="settings-header">
+            <h2>Settings</h2>
+            <p>Change some of your informations here.</p>
+        </div>
+        <div *ngIf="!currentUser">
+            <p>Please log in to access settings.</p>
+        </div>
+
+        <div *ngIf="errorMessage" class="error-message">
+            {{errorMessage}}
+        </div>
+
+         <div *ngIf="showSuccess" class="success-message">
+            Your settings have been successfully updated.
+        </div>
+        <form class="settings-form" [formGroup]="SettingsUsernameForm" (ngSubmit)="updatingUsername()">
+            <div class="form-group">
+                <label for="updatedUserName">Change your username:</label>
+                <input 
+                    type="text" 
+                    id="updatedUserName" 
+                    formControlName="updatedUserName" 
+                    class="form-control"
+                    placeholder="{{ currentUser?.userName }}"
+                />
+            </div>
+            <div class="form-group">
+                <button 
+                    type="submit" 
+                    class="btn btn-sm" 
+                    [disabled]="!SettingsUsernameForm.valid || SettingsUsernameForm.value.updatedUserName === currentUser?.userName || SettingsUsernameForm.value.updatedUserName === ''">
+                    Change
+                </button>
+            </div>
+        </form>
+        <form class="settings-form" [formGroup]="SettingsProfilePictureForm" (ngSubmit)="updatingProfilePicture($event)">
+            <div class="user-avatar-container">
+                <label>Change your profile picture:</label>
+                <div 
+                    class="image-container"
+                    *ngIf="userProfilePicture; else placeholder"
+                    [ngClass]="{'box-shadow-avatar': !!userProfilePicture}"
+                    [ngStyle]="{backgroundImage: 'url(' + userProfilePicture + ')'}">
+                </div> 
+                
+                <ng-template #placeholder>
+                    <div class="image-container avatar-placeholder">
+                    </div>
+                </ng-template>
+
+                <label for="avatar-input-file" class="file-input-container">
+                    <mat-icon class="icon" fontIcon="edit"></mat-icon>
+                </label>
+                <div class="icon_wrapper">
+                    <input 
+                        type="file"
+                        id="avatar-input-file"
+                        formControlName="updatedProfilePicture" 
+                        accept="image/*"
+                        (change)="updatingProfilePicture($event)"
+                        placeholder="file"
+                    />
+                </div>
+            </div>
+        </form>
+        <button 
+            type="button"
+            class="btn btn-primary" 
+            (click)="goHome()">
+            <mat-icon class="icon">home</mat-icon>
+      </button>
+    </div>
+</div>

@@ -32,7 +32,7 @@ export class ForgotPasswordComponent implements OnInit {
       private router: Router,
       private route: ActivatedRoute,) {
         this.forgotPasswordForm = this.formBuilder.group({
-        email: ['', [Validators.required,]],
+        email: ['', [Validators.required, Validators.email]],
       });
   }
 
@@ -81,6 +81,9 @@ export class ForgotPasswordComponent implements OnInit {
       if (control?.errors && control.touched) {
       if (control.errors['required']) {
           return `${this.getFieldLabel(fieldName)} is required.`;
+      }
+      if (control.errors['email']) {
+          return `Please enter a valid email address.`;
       }
   }
   return '';

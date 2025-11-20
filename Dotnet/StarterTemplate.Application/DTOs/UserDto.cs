@@ -66,4 +66,26 @@ namespace StarterTemplate.Application.DTOs
         /// </summary>
         public List<string> Roles { get; set; } = new List<string>();
     }
+
+    /// <summary>
+    /// Data Transfer Object for User entities.
+    /// Used for transferring updated user data between the API and client applications.
+    /// </summary>
+    public class NewUserDto
+    {
+        /// <summary>
+        /// Gets or sets the new unique username for the user.
+        /// This is a optional field with a maximum length of 50 characters.
+        /// </summary>
+        [StringLength(50)]
+        
+        public string NewUserName { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// Gets or sets the new profile picture of the user as a base64 encoded string.
+        /// This field is optional and stores the user's profile image.
+        /// </summary>
+        [StringLength(1000000)] // Allow for large base64 strings
+        public string? NewProfilePicture { get; set; }
+    }
 }

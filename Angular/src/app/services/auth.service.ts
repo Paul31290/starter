@@ -46,7 +46,8 @@ export class AuthService {
               email: response.email,
               roles: response.roles,
               isActive: true,
-              createdAt: new Date()
+              createdAt: new Date(),
+              profilePicture: response.profilePicture,
             });
           } else {
             this.logout();
@@ -171,7 +172,7 @@ export class AuthService {
     localStorage.setItem('refresh_token', refreshToken);
   }
 
-  private setCurrentUser(user: AuthUser): void {
+  setCurrentUser(user: AuthUser): void {
     this.currentUserSubject.next(user);
     this.isAuthenticatedSubject.next(true);
   }
@@ -217,13 +218,27 @@ export class AuthService {
     return expiration.getTime() - Date.now() < fiveMinutes;
   }
 
-  forgotPassword(request: ForgotPasswordRequest): Observable<any> {
+  forgotPassword(forgotRequest: ForgotPasswordRequest): Observable<any> {
     this.setLoading(true);
-    return this.http.post<AuthResponse>(`${this.baseUrl}/forgot-password`, request)
+    return this.http.post<ForgotPasswordRequest>(`${this.baseUrl}/forgot-password`, forgotRequest).pipe(
+      tap(() => 
+        this.setLoading(false)
+        ),  
+      catchError(error => {
+        this.setLoading(false);
+        return throwError(() => error);
+      })
+    )
   }
 
-  public resetPassword(request: ResetPasswordRequest) : Observable<any> {
+  resetPassword(resetRequest: ResetPasswordRequest) : Observable<any> {
     this.setLoading(true);
-    return this.http.post<AuthResponse>(`${this.baseUrl}/reset-password`, request);
+    return this.http.post<ResetPasswordRequest>(`${this.baseUrl}/reset-password`, resetRequest).pipe(
+      tap(() => this.setLoading(false)),  
+      catchError(error => {
+        this.setLoading(false);
+        return throwError(() => error);
+      })
+    );
   }
 } 

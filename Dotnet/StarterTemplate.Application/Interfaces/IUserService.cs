@@ -65,5 +65,36 @@ namespace StarterTemplate.Application.Interfaces
         /// <param name="roleId">The role ID to remove.</param>
         /// <returns>True if successful; otherwise, false.</returns>
         Task<bool> RemoveRoleFromUserAsync(int userId, int roleId);
+
+        /// <summary>
+        /// Update the profile picture of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <param name="newProfilePictureDto">The new profile picture as a base64 encoded string from the Data Transfer Object.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        Task<bool> UpdateProfilePictureAsync(int userId, NewUserDto newProfilePictureDto);
+
+        /// <summary>
+        /// Gets the profile picture of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <returns>The profile picture of a user</returns>
+        Task<string?> GetUserProfilePictureAsync(int userId);
+
+        /// <summary>
+        /// Update the username of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <param name="newUserNameDto">The new username Data Transfer Object.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        Task<bool> UpdateUserNameAsync(int userId, NewUserDto newUserNameDto);
+
+        /// <summary>
+        /// Update the status of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <param name="newStatus">The new status.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        Task<bool> UpdateUserStatusAsync(int userId, bool newStatus);
     }
 }
