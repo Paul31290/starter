@@ -19,11 +19,12 @@ import { CommonModule } from "@angular/common";
       <app-layout type="full">
       <app-global-notification />
       <div class="main-content">
-        <nav *ngIf="currentUser">
-          <a routerLink="/" class="routerOption home"><mat-icon>home</mat-icon></a>
-          <a routerLink="/settings" class="routerOption settings" (click)=onSettings()><mat-icon>settings</mat-icon></a>
-          <a routerLink="/profile" class="routerOption profile" (click)=onProfile()><mat-icon>account_circle</mat-icon></a>
-        </nav>        
+        @if (currentUser){
+          <nav>
+            <a routerLink="/settings" class="routerOption settings" (click)=onSettings()><mat-icon>settings</mat-icon></a>
+            <a routerLink="/profile" class="routerOption profile" (click)=onProfile()><mat-icon>account_circle</mat-icon></a>
+          </nav>
+        }        
         <router-outlet></router-outlet>
       </div>
       </app-layout>

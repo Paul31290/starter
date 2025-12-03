@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthUser } from '../../models/auth.model';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -7,7 +6,13 @@ import { SettingsService } from '../../services/settings.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { User, NewUser } from '../../models/user.model';
-import { UserService } from '../../services/user.service';
+import { HomeComponent } from '../../home/home.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-settings',
@@ -15,7 +20,13 @@ import { UserService } from '../../services/user.service';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    MatIconModule
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    TranslateModule,
+    MatIconModule,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
@@ -24,18 +35,18 @@ export class SettingsComponent implements OnInit {
   currentUser: User | null = null;
   loading = false;
   showSuccess = false;
-  errorMessage = '';
+  errorMessage = false;
   returnUrl = '';
   SettingsUsernameForm: FormGroup;
   SettingsProfilePictureForm: FormGroup;
   file = "";
-  userProfilePicture = "";
 
   constructor(
     private authService: AuthService,
     private settingsService: SettingsService,
     private router: Router,
     private formBuilder: FormBuilder,
+    private home: HomeComponent,
   ) {
     this.SettingsUsernameForm = this.formBuilder.group({
       updatedUserName: ['', [Validators.minLength(3), Validators.maxLength(50), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
@@ -56,7 +67,7 @@ export class SettingsComponent implements OnInit {
     if (this.SettingsUsernameForm.valid && this.currentUser) {
       this.loading = true;
       this.showSuccess = false;
-      this.errorMessage = '';
+      this.errorMessage =false;
 
       const updatedUserName : NewUser = {
         newUserName: this.SettingsUsernameForm.value.updatedUserName,
@@ -74,7 +85,7 @@ export class SettingsComponent implements OnInit {
         error: (error) => {
           console.error('Error updating username:', error);
           this.loading = false;
-          this.errorMessage = 'Failed to update username. Please try again.';
+          this.errorMessage = true;
         }
       });
     } else {
@@ -86,7 +97,7 @@ export class SettingsComponent implements OnInit {
     if (this.currentUser) {
       this.loading = true;
       this.showSuccess = false;
-      this.errorMessage = '';
+      this.errorMessage = false;
 
       try {
         const base64file = await this.readFileProfilePicture(event);
@@ -102,19 +113,18 @@ export class SettingsComponent implements OnInit {
             this.showSuccess = true;
             if(this.currentUser){
               this.currentUser.profilePicture = updatedProfilePicture.newProfilePicture;
-              this.userProfilePicture = this.currentUser.profilePicture;
             }
           },
           error: (error) => {
             console.error('Error updating profile picture:', error);
             this.loading = false;
-            this.errorMessage = 'Failed to update the profile picture. Please try again.';
+            this.errorMessage = true;
           }
         });
       } catch (err) {
         console.error('Error reading file:', err);
         this.loading = false;
-        this.errorMessage = 'Failed to read the selected file.';
+        this.errorMessage = true;
       } 
     } else {
       this.markProfilePictureFormGroupTouched();
@@ -155,7 +165,6 @@ export class SettingsComponent implements OnInit {
 
   private async getDynamicProfilePicture(): Promise<void>{
     if (!this.currentUser?.id) {
-      this.userProfilePicture = '';
       return;
     }
 
@@ -165,21 +174,18 @@ export class SettingsComponent implements OnInit {
         if (response.startsWith('data:')) {
           dataUrl = response;
         } else {
-          this.isBase64(response)
+          this.home.isBase64(response)
           dataUrl = `${response}`;
         }
-        this.userProfilePicture = dataUrl;
+        if (this.currentUser) {
+          this.currentUser.profilePicture = dataUrl;
+        }
 
       },
       error: (error) => {
       console.error('Error getting the profile picture:', error);
     }
     });
-  }
-
-  private isBase64(str: string): boolean {
-    // basic heuristic — adjust as needed
-    return !!str && /^[A-Za-z0-9+/=\s]+$/.test(str) && str.length % 4 === 0;
   }
 
   goHome(): void {

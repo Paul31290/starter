@@ -5,6 +5,12 @@ import { AuthService } from '../../../services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ResetPasswordRequest } from '../../../models/auth.model';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -15,14 +21,20 @@ import { ResetPasswordRequest } from '../../../models/auth.model';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    TranslateModule
 ],
 })
 export class ResetPasswordComponent implements OnInit {
     resetPasswordForm: FormGroup;
     loading = false;
     showSuccess = false;
-    errorMessage = '';
+    errorMessage = false;
     returnUrl = '';
 
     private token = '';
@@ -35,9 +47,12 @@ export class ResetPasswordComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,) {
             this.resetPasswordForm = this.formBuilder.group({
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)]],
-            confirm: ['', [Validators.required]],
+            password: ['', [
+              Validators.required,
+              Validators.minLength(8),
+              Validators.maxLength(255),
+              Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)]],
+            confirmPassword: ['', [Validators.required]],
         }, { validators: this.passwordMatchValidator });
     }
 
@@ -58,7 +73,7 @@ export class ResetPasswordComponent implements OnInit {
         if (this.resetPasswordForm.valid) {
           this.loading = true;
           this.showSuccess = false;
-          this.errorMessage = '';
+          this.errorMessage = false;
     
           const resetPasswordRequest: ResetPasswordRequest = {
             email: this.resetPasswordForm.value.email,
@@ -75,7 +90,7 @@ export class ResetPasswordComponent implements OnInit {
             },
             error: (error) => {
               this.loading = false;
-              this.errorMessage = error.error?.message || 'Password reset failed. Please try again.';
+              this.errorMessage = true;
             }
           });
         } else {
@@ -89,6 +104,46 @@ export class ResetPasswordComponent implements OnInit {
         control?.markAsTouched();
         });
     }
+
+    isFieldRequired(fieldName: string): boolean {
+    const control = this.resetPasswordForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
+
+  isFieldUnderMinLength(fieldName: string): boolean {
+    const control = this.resetPasswordForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['minlength']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
+
+  isFieldOverMaxLength(fieldName: string): boolean {
+    const control = this.resetPasswordForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['maxlength']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
+
+  isFieldPatternMismatch(fieldName: string): boolean {
+    const control = this.resetPasswordForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['pattern']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
     
     getFieldError(fieldName: string): string {
         const control = this.resetPasswordForm.get(fieldName);
@@ -102,16 +157,8 @@ export class ResetPasswordComponent implements OnInit {
         if (control.errors['maxlength']) {
           return `${this.getFieldLabel(fieldName)} cannot exceed ${control.errors['maxlength'].requiredLength} characters.`;
         }
-        if (control.errors['email']) {
-          return 'Please enter a valid email address.';
-        }
         if (control.errors['pattern']) {
-          if (fieldName === 'userName') {
-            return 'Username can only contain letters, numbers, and underscores.';
-          }
-          if (fieldName === 'password') {
-            return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.';
-          }
+          return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.';
         }
         if (control.errors['passwordMismatch']) {
           return 'Passwords do not match.';

@@ -1,10 +1,15 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ForgotPasswordRequest } from '../../../models/auth.model';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -15,16 +20,21 @@ import { ForgotPasswordRequest } from '../../../models/auth.model';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    TranslateModule
 ],
 })
 export class ForgotPasswordComponent implements OnInit {
   forgotPasswordForm: FormGroup;
   loading = false;
-  errorMessage = '';
+  errorMessage = false;
   returnUrl = '';
   showSuccess = false;
-
 
   constructor(
       private formBuilder: FormBuilder,
@@ -48,7 +58,7 @@ export class ForgotPasswordComponent implements OnInit {
       if (this.forgotPasswordForm.valid) {
         this.loading = true;
         this.showSuccess = false;
-        this.errorMessage = '';
+        this.errorMessage = false;
   
         const forgotPasswordRequest: ForgotPasswordRequest = {
           email: this.forgotPasswordForm.value.email,
@@ -57,11 +67,16 @@ export class ForgotPasswordComponent implements OnInit {
         this.authService.forgotPassword(forgotPasswordRequest).subscribe({
           next: (response) => {
             this.loading = false;
-            this.showSuccess = true;
+            if(response === false){
+              this.errorMessage = true;
+            } else {
+              this.showSuccess = true;
+            }
           },
           error: (error) => {
+            console.error('Error sending email:', error);
             this.loading = false;
-            this.errorMessage = error.error?.message || 'Password reset failed. Please try again.';
+            this.errorMessage = true;
           }
         });
       } else {
@@ -76,28 +91,23 @@ export class ForgotPasswordComponent implements OnInit {
       });
   }
   
-  getFieldError(fieldName: string): string {
+  isFieldRequired(fieldName: string): boolean {
       const control = this.forgotPasswordForm.get(fieldName);
       if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-          return `${this.getFieldLabel(fieldName)} is required.`;
+        if (control.errors['required']) {
+          return !!(control?.invalid && control.touched);
+        }
       }
-      if (control.errors['email']) {
-          return `Please enter a valid email address.`;
-      }
-  }
-  return '';
+    return false;
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-      const control = this.forgotPasswordForm.get(fieldName);
-      return !!(control?.invalid && control.touched);
-  }
-  
-  private getFieldLabel(fieldName: string): string {
-  const labels: { [key: string]: string } = {
-    'email': 'Email',
-  };
-  return labels[fieldName] || fieldName;
+  isFieldEmail(fieldName: string): boolean {
+    const control = this.forgotPasswordForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['email']) {
+        return !!(control?.invalid && control.touched);
+      }
+    }
+    return false;
   }
 }

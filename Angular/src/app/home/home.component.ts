@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Injectable, OnInit } from "@angular/core";
 import { LayoutComponent } from "../components/layout/layout.component";
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterModule } from '@angular/router';
@@ -28,30 +28,31 @@ import { SettingsService } from "../services/settings.service";
         <div class="welcome-section">
           <h1>{{ 'HOME.TITLE' | translate }}</h1>
           <p class="subtitle">Welcome to the Starter Template Application</p>
-          <div class="user-info" *ngIf="currentUser">
-            <p>Welcome back, <strong>{{ currentUser.firstName || currentUser.userName }}</strong>!</p>
-            <div class="user-avatar-container">
-                <div 
-                    class="image-container"
-                    *ngIf="currentUser.profilePicture ; else placeholder"
-                    [ngClass]="{'box-shadow-avatar': !!currentUser.profilePicture }"
-                    [ngStyle]="{backgroundImage: 'url(' + currentUser.profilePicture  + ')'}">
-                </div> 
-                
-                <ng-template #placeholder>
-                    <div class="image-container avatar-placeholder">
-                    </div>
-                </ng-template>
+          @if(currentUser){
+            <div class="user-info">
+              <p>Welcome back, <strong>{{ currentUser.firstName || currentUser.userName }}</strong>!</p>
+              <div class="user-avatar-container">
+                @if (currentUser.profilePicture){
+                  <div class="image-container"
+                      [class]="{'box-shadow-avatar': !!currentUser.profilePicture }"
+                      [ngStyle]="{backgroundImage: 'url(' + currentUser.profilePicture  + ')'}">
+                  </div> 
+                } @else { 
+                  <div class="image-container avatar-placeholder"> </div>
+                }
+              </div>
+              <div class="user-roles">
+                @for (role of currentUser.roles; track currentUser.id){
+                  <span class="role-badge"> {{ role }}</span>
+                }
+              </div>
+              <div class="logout">
+                <button mat-button color="warn" (click)="logout()">
+                  <mat-icon>exit_to_app</mat-icon>
+                </button>
+              </div>
             </div>
-            <div class="user-roles">
-              <span class="role-badge" *ngFor="let role of currentUser.roles">{{ role }}</span>
-            </div>
-            <div class="logout">
-              <button mat-button color="warn" (click)="logout()">
-                <mat-icon>exit_to_app</mat-icon>
-              </button>
-            </div>
-          </div>
+          }
         </div>
       </div>
     </app-layout>
@@ -185,6 +186,9 @@ import { SettingsService } from "../services/settings.service";
     }
   `],
 })
+
+@Injectable({ providedIn: 'root' })
+
 export class HomeComponent implements OnInit {
   currentUser: AuthUser | null = null;
   userProfile: User | null = null;
@@ -236,14 +240,12 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  private isBase64(str: string): boolean {
-    // basic heuristic — adjust as needed
+  isBase64(str: string): boolean {
     return !!str && /^[A-Za-z0-9+/=\s]+$/.test(str) && str.length % 4 === 0;
   }
 
   logout(): void {
     this.authService.logout().subscribe(() => {
-      // Go to the login page
       this.router.navigate(['/auth/login']);
     });
   }

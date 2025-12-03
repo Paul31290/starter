@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using StarterTemplate.Application.DTOs;
 using StarterTemplate.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using ASPNETCoreIdentityDemo.ViewModels;
 
 namespace StarterTemplate.Api.Controllers
 {
@@ -185,23 +184,6 @@ namespace StarterTemplate.Api.Controllers
             {
                 _logger.LogError(ex, "Error occurred during token validation");
                 return StatusCode(500, new { message = "An error occurred during token validation." });
-            }
-        }
-        /// <summary>
-        /// Renders the forgot password view.
-        /// </summary>
-        /// <returns> The forgot password view.</returns>
-        [HttpGet("forgot-password")]
-        public IActionResult ForgotPassword()
-        {
-            try
-            {
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred during the retrieving of the password");
-                return StatusCode(500, new { message = "An error occurred during the password recovery." });
             }
         }
 

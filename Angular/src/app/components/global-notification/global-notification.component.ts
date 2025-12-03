@@ -16,32 +16,38 @@ export interface Notification {
   imports: [CommonModule],
   template: `
     <div class="notification-container">
-      <div 
-        *ngFor="let notification of notifications" 
-        class="notification"
-        [ngClass]="'notification-' + notification.type"
-        [@slideIn]
-      >
-        <div class="notification-content">
-          <div class="notification-icon">
-            <span *ngIf="notification.type === 'success'">✓</span>
-            <span *ngIf="notification.type === 'error'">✗</span>
-            <span *ngIf="notification.type === 'warning'">⚠</span>
-            <span *ngIf="notification.type === 'info'">ℹ</span>
+      @for (notification of notifications; track notification.id){
+        <div 
+          class="notification"
+          [ngClass]="'notification-' + notification.type"
+          [@slideIn]
+        >
+          <div class="notification-content">
+            <div class="notification-icon">
+              @if(notification.type === 'success'){
+                <span>✓</span>
+              } @else if (notification.type === 'error'){
+                <span>✗</span>
+              } @else if (notification.type === 'warning'){
+                <span>⚠</span>
+              } @else if (notification.type === 'info'){
+                <span>ℹ</span>
+              }
+            </div>
+            <div class="notification-text">
+              <div class="notification-title">{{ notification.title }}</div>
+              <div class="notification-message">{{ notification.message }}</div>
+            </div>
+            <button 
+              class="notification-close" 
+              (click)="removeNotification(notification.id)"
+              aria-label="Close notification"
+            >
+              ×
+            </button>
           </div>
-          <div class="notification-text">
-            <div class="notification-title">{{ notification.title }}</div>
-            <div class="notification-message">{{ notification.message }}</div>
-          </div>
-          <button 
-            class="notification-close" 
-            (click)="removeNotification(notification.id)"
-            aria-label="Close notification"
-          >
-            ×
-          </button>
         </div>
-      </div>
+      }
     </div>
   `,
   styles: [`

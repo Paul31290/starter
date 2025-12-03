@@ -50,6 +50,7 @@ export const routes: Routes = [
     path: "settings",
     loadComponent: () =>
       import("./components/settings/settings.component").then((c) => c.SettingsComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: "unauthorized",

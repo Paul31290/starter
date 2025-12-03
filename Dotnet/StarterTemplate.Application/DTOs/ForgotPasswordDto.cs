@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-namespace ASPNETCoreIdentityDemo.ViewModels
+
+namespace StarterTemplate.Application.DTOs
 {
     public class ForgotPasswordDto
     {

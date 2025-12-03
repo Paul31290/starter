@@ -1,23 +1,28 @@
 <div class="settings-container">
     <div class="settings-card">
         <div class="settings-header">
-            <h2>Settings</h2>
-            <p>Change some of your informations here.</p>
+            <h2>{{ 'NAVIGATION.SETTINGS' | translate}}</h2>
         </div>
-        <div *ngIf="!currentUser">
-            <p>Please log in to access settings.</p>
-        </div>
-
-        <div *ngIf="errorMessage" class="error-message">
-            {{errorMessage}}
-        </div>
-
-         <div *ngIf="showSuccess" class="success-message">
-            Your settings have been successfully updated.
-        </div>
+        @if(!currentUser){
+            <div>
+                <p class="error-message">
+                    {{ 'MESSAGES.FETCH_FAILED' | translate }}
+                </p>
+            </div>
+        }
+        @if(errorMessage){
+            <div class="error-message">
+                {{ 'MESSAGES.ERROR_OCCURRED' | translate }}
+            </div>
+        }
+        @if(showSuccess){
+            <div class="success-message">
+                {{ 'SETTINGS.SETTINGS_SAVED' | translate }}
+            </div>
+        }
         <form class="settings-form" [formGroup]="SettingsUsernameForm" (ngSubmit)="updatingUsername()">
             <div class="form-group">
-                <label for="updatedUserName">Change your username:</label>
+                <label for="updatedUserName">{{ 'USERS.CHANGE_USERNAME' | translate }}:</label>
                 <input 
                     type="text" 
                     id="updatedUserName" 
@@ -31,24 +36,23 @@
                     type="submit" 
                     class="btn btn-sm" 
                     [disabled]="!SettingsUsernameForm.valid || SettingsUsernameForm.value.updatedUserName === currentUser?.userName || SettingsUsernameForm.value.updatedUserName === ''">
-                    Change
+                    {{ 'COMMON.CHANGE' | translate }}
                 </button>
             </div>
         </form>
         <form class="settings-form" [formGroup]="SettingsProfilePictureForm" (ngSubmit)="updatingProfilePicture($event)">
             <div class="user-avatar-container">
-                <label>Change your profile picture:</label>
-                <div 
-                    class="image-container"
-                    *ngIf="userProfilePicture; else placeholder"
-                    [ngClass]="{'box-shadow-avatar': !!userProfilePicture}"
-                    [ngStyle]="{backgroundImage: 'url(' + userProfilePicture + ')'}">
-                </div> 
-                
-                <ng-template #placeholder>
-                    <div class="image-container avatar-placeholder">
-                    </div>
-                </ng-template>
+                <label>{{ 'USERS.CHANGE_PROFILE_PICTURE' | translate }} :</label>
+                <div class="user-avatar-container">
+                    @if (currentUser?.profilePicture){
+                    <div class="image-container"
+                        [class]="{'box-shadow-avatar': !!currentUser?.profilePicture }"
+                        [ngStyle]="{backgroundImage: 'url(' + currentUser?.profilePicture  + ')'}">
+                    </div> 
+                    } @else { 
+                    <div class="image-container avatar-placeholder"> </div>
+                    }
+                </div>
 
                 <label for="avatar-input-file" class="file-input-container">
                     <mat-icon class="icon" fontIcon="edit"></mat-icon>
@@ -70,6 +74,6 @@
             class="btn btn-primary" 
             (click)="goHome()">
             <mat-icon class="icon">home</mat-icon>
-      </button>
+        </button>
     </div>
 </div>

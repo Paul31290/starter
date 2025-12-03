@@ -6,32 +6,34 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="confirm-overlay" *ngIf="visible">
-      <div class="confirm-dialog">
-        <div class="confirm-header">
-          <h3 class="confirm-title">{{ title || 'Confirm' }}</h3>
-        </div>
-        <div class="confirm-body">
-          <p class="confirm-message">{{ message }}</p>
-        </div>
-        <div class="confirm-footer">
-          <button 
-            type="button" 
-            class="btn btn-secondary" 
-            (click)="onCancel()"
-          >
-            Cancel
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-primary" 
-            (click)="onConfirm()"
-          >
-            Confirm
-          </button>
+    @if(visible){
+      <div class="confirm-overlay">
+        <div class="confirm-dialog">
+          <div class="confirm-header">
+            <h3 class="confirm-title">{{ title || 'Confirm' }}</h3>
+          </div>
+          <div class="confirm-body">
+            <p class="confirm-message">{{ message }}</p>
+          </div>
+          <div class="confirm-footer">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="onCancel()"
+            >
+              Cancel
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              (click)="onConfirm()"
+            >
+              Confirm
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    }
   `,
   styles: [`
     .confirm-overlay {
