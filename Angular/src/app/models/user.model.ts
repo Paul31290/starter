@@ -12,3 +12,8 @@ export interface User {
   isActive: boolean;
   roles: string[];
 }
+
+export interface NewUser{
+  newUserName: string;
+  newProfilePicture: string;
+}

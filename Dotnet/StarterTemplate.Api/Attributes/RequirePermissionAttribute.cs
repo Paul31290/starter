@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 using StarterTemplate.Application.Repositories;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace StarterTemplate.Api.Attributes
 {

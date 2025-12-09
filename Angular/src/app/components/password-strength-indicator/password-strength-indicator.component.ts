@@ -12,7 +12,8 @@ export interface PasswordStrength {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="password-strength-indicator" *ngIf="password">
+  @if(password){
+    <div class="password-strength-indicator">
       <div class="strength-bar">
         <div 
           class="strength-fill" 
@@ -24,6 +25,7 @@ export interface PasswordStrength {
         {{ strength.label }}
       </div>
     </div>
+  }
   `,
   styles: [`
     .password-strength-indicator {

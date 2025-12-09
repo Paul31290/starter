@@ -37,6 +37,7 @@ export interface AuthUser {
   lastLoginAt?: Date;
   isActive: boolean;
   roles: string[];
+  profilePicture?: string;
 }
 
 export interface TokenValidationResponse {
@@ -45,4 +46,16 @@ export interface TokenValidationResponse {
   email: string;
   roles: string[];
   isValid: boolean;
+  profilePicture?: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  confirmPassword: string;
+  email: string;
+  token: string;
 }

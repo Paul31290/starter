@@ -186,5 +186,74 @@ namespace StarterTemplate.Api.Controllers
                 return StatusCode(500, new { message = "An error occurred during token validation." });
             }
         }
+
+        /// <summary>
+        /// Handles the forgot password request by sending a reset link to the user's email.
+        /// </summary>
+        /// <param name="forgotPasswordDto"></param>
+        /// <returns>A Result indicating the success or failure of the operation.</returns>
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var emailResult = await _jwtAuthService.SendPasswordResetLinkAsync(forgotPasswordDto.Email);
+                // Always show confirmation view (don’t reveal if email exists)
+                return Ok(emailResult);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred during the email transmission");
+                return StatusCode(500, new { message = "An error occurred during the sending of the reset password." });
+            }
+        }
+        /// <summary>
+        /// Renders the reset password screen
+        /// </summary>
+        /// <param name="email">The email of the user resetting the password</param>
+        /// <param name="token">The generated token for the password reset process</param>
+        /// <returns>The reset password screen with the email and token</returns>
+        [HttpGet("reset-password")]
+        public IActionResult ResetPassword(string email, [FromQuery] string token)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+                    return BadRequest("Invalid password reset request.");
+                return Ok(new ResetPasswordDto { Email = email, Token = token });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred during the password reset request");
+                return StatusCode(500, new { message = "An error occurred during the request of the reset password." });
+            }
+        }
+
+        /// <summary>
+        /// Handles the reset password request by updating the user's password.
+        /// </summary>
+        /// <param name="resetPasswordDto">The reset password information.</param>
+        /// <returns>A Result indicating the success or failure of the operation.</returns>
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var result = await _jwtAuthService.ResetPasswordAsync(resetPasswordDto);
+                if (result.IsValid)
+                    return Ok(result);
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.ErrorMessage);
+                return Ok(resetPasswordDto);
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while resetting the password");
+                return StatusCode(500, new { message = "An error occurred while resetting the password." });
+            }
+        }
     }
 }

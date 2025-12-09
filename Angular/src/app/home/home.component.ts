@@ -1,30 +1,58 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Injectable, OnInit } from "@angular/core";
 import { LayoutComponent } from "../components/layout/layout.component";
 import { TranslateModule } from '@ngx-translate/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { AuthUser } from '../models/auth.model';
+import { User } from "../models/user.model";
+import { SettingsService } from "../services/settings.service";
 
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [LayoutComponent, TranslateModule, RouterModule, MatButtonModule, MatCardModule, MatIconModule, CommonModule],
+  imports: [
+    LayoutComponent, 
+    TranslateModule, 
+    RouterModule, 
+    MatButtonModule, 
+    MatCardModule, 
+    MatIconModule, 
+    CommonModule],
   template: `
     <app-layout type="full">
       <div class="home-content">
         <div class="welcome-section">
           <h1>{{ 'HOME.TITLE' | translate }}</h1>
           <p class="subtitle">Welcome to the Starter Template Application</p>
-          <div class="user-info" *ngIf="currentUser">
-            <p>Welcome back, <strong>{{ currentUser.firstName || currentUser.userName }}</strong>!</p>
-            <div class="user-roles">
-              <span class="role-badge" *ngFor="let role of currentUser.roles">{{ role }}</span>
+          @if(currentUser){
+            <div class="user-info">
+              <p>Welcome back, <strong>{{ currentUser.firstName || currentUser.userName }}</strong>!</p>
+              <div class="user-avatar-container">
+                @if (currentUser.profilePicture){
+                  <div class="image-container"
+                      [class]="{'box-shadow-avatar': !!currentUser.profilePicture }"
+                      [ngStyle]="{backgroundImage: 'url(' + currentUser.profilePicture  + ')'}">
+                  </div> 
+                } @else { 
+                  <div class="image-container avatar-placeholder"> </div>
+                }
+              </div>
+              <div class="user-roles">
+                @for (role of currentUser.roles; track currentUser.id){
+                  <span class="role-badge"> {{ role }}</span>
+                }
+              </div>
+              <div class="logout">
+                <button mat-button color="warn" (click)="logout()">
+                  <mat-icon>exit_to_app</mat-icon>
+                </button>
+              </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </app-layout>
@@ -63,6 +91,14 @@ import { AuthUser } from '../models/auth.model';
 
     .user-roles {
       margin-top: 0.5rem;
+    }
+
+    .settings {
+      margin-top: 1rem;
+    }
+
+    .logout {
+      margin-top: 1rem;
     }
 
     .role-badge {
@@ -117,6 +153,27 @@ import { AuthUser } from '../models/auth.model';
       gap: 0.5rem;
     }
 
+    .user-avatar-container {
+      position: relative;
+      width: fit-content;
+    }
+
+    .image-container {
+      height: 75px;
+      width: 75px;
+      z-index: 1;
+      border-radius: 50%;
+      background-color: #fff;
+      background-position: center;
+      background-size: cover;
+      box-shadow: 0 10px 20px 20px #6c93001a;
+
+    }
+
+    .image-container .avatar-placeholder{
+      background-image: url('/assets/img/avatar-placeholder.png');
+    }
+
     @media (max-width: 768px) {
       .home-content {
         padding: 1rem;
@@ -129,14 +186,28 @@ import { AuthUser } from '../models/auth.model';
     }
   `],
 })
+
+@Injectable({ providedIn: 'root' })
+
 export class HomeComponent implements OnInit {
   currentUser: AuthUser | null = null;
+  userProfile: User | null = null;
+  userProfilePicture = "";
 
-  constructor(private authService: AuthService) { }
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private settingsService: SettingsService,) 
+    { }
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
+      this.userProfile = user;
+      if (this.userProfile){
+        this.getDynamicProfilePicture();
+      }
     });
   }
 
@@ -144,8 +215,38 @@ export class HomeComponent implements OnInit {
     return this.authService.hasAnyRole(['Administrator', 'Manager']);
   }
 
+  private async getDynamicProfilePicture(): Promise<void>{
+    if (!this.userProfile?.id) {
+      this.userProfilePicture = '';
+      return;
+    }
+    this.settingsService.getProfilePicture(this.userProfile.id).subscribe({
+      next: async (response) => {
+        let dataUrl: string;
+        if (response.startsWith('data:')) {
+          dataUrl = response;
+        } else {
+          this.isBase64(response)
+          dataUrl = `${response}`;
+        }
+        this.userProfilePicture = dataUrl;
+        if(this.currentUser){
+          this.currentUser.profilePicture = dataUrl;
+        }
+      },
+      error: (error) => {
+      console.error('Error getting the profile picture:', error);
+    }
+    });
+  }
+
+  isBase64(str: string): boolean {
+    return !!str && /^[A-Za-z0-9+/=\s]+$/.test(str) && str.length % 4 === 0;
+  }
+
   logout(): void {
     this.authService.logout().subscribe(() => {
+      this.router.navigate(['/auth/login']);
     });
   }
 }

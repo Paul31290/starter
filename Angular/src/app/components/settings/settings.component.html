@@ -1,0 +1,79 @@
+<div class="settings-container">
+    <div class="settings-card">
+        <div class="settings-header">
+            <h2>{{ 'NAVIGATION.SETTINGS' | translate}}</h2>
+        </div>
+        @if(!currentUser){
+            <div>
+                <p class="error-message">
+                    {{ 'MESSAGES.FETCH_FAILED' | translate }}
+                </p>
+            </div>
+        }
+        @if(errorMessage){
+            <div class="error-message">
+                {{ 'MESSAGES.ERROR_OCCURRED' | translate }}
+            </div>
+        }
+        @if(showSuccess){
+            <div class="success-message">
+                {{ 'SETTINGS.SETTINGS_SAVED' | translate }}
+            </div>
+        }
+        <form class="settings-form" [formGroup]="SettingsUsernameForm" (ngSubmit)="updatingUsername()">
+            <div class="form-group">
+                <label for="updatedUserName">{{ 'USERS.CHANGE_USERNAME' | translate }}:</label>
+                <input 
+                    type="text" 
+                    id="updatedUserName" 
+                    formControlName="updatedUserName" 
+                    class="form-control"
+                    placeholder="{{ currentUser?.userName }}"
+                />
+            </div>
+            <div class="form-group">
+                <button 
+                    type="submit" 
+                    class="btn btn-sm" 
+                    [disabled]="!SettingsUsernameForm.valid || SettingsUsernameForm.value.updatedUserName === currentUser?.userName || SettingsUsernameForm.value.updatedUserName === ''">
+                    {{ 'COMMON.CHANGE' | translate }}
+                </button>
+            </div>
+        </form>
+        <form class="settings-form" [formGroup]="SettingsProfilePictureForm" (ngSubmit)="updatingProfilePicture($event)">
+            <div class="user-avatar-container">
+                <label>{{ 'USERS.CHANGE_PROFILE_PICTURE' | translate }} :</label>
+                <div class="user-avatar-container">
+                    @if (currentUser?.profilePicture){
+                    <div class="image-container"
+                        [class]="{'box-shadow-avatar': !!currentUser?.profilePicture }"
+                        [ngStyle]="{backgroundImage: 'url(' + currentUser?.profilePicture  + ')'}">
+                    </div> 
+                    } @else { 
+                    <div class="image-container avatar-placeholder"> </div>
+                    }
+                </div>
+
+                <label for="avatar-input-file" class="file-input-container">
+                    <mat-icon class="icon" fontIcon="edit"></mat-icon>
+                </label>
+                <div class="icon_wrapper">
+                    <input 
+                        type="file"
+                        id="avatar-input-file"
+                        formControlName="updatedProfilePicture" 
+                        accept="image/*"
+                        (change)="updatingProfilePicture($event)"
+                        placeholder="file"
+                    />
+                </div>
+            </div>
+        </form>
+        <button 
+            type="button"
+            class="btn btn-primary" 
+            (click)="goHome()">
+            <mat-icon class="icon">home</mat-icon>
+        </button>
+    </div>
+</div>

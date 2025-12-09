@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using StarterTemplate.Application.DTOs;
 using StarterTemplate.Application.Interfaces;
 using StarterTemplate.Api.Controllers;
+using System.Text.Json;
+using System.Runtime;
 
 namespace StarterTemplate.Api.Controllers
 {
@@ -15,9 +17,12 @@ namespace StarterTemplate.Api.Controllers
     {
         private readonly ISettingsService _settingsService;
 
-        public SettingsController(ISettingsService settingsService)
+        private readonly IUserService _userService;
+
+        public SettingsController(ISettingsService settingsService, IUserService userService)
         {
             _settingsService = settingsService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -193,6 +198,99 @@ namespace StarterTemplate.Api.Controllers
                 return HandleException(ex);
             }
         }
+
+        
+        /// <summary>
+        /// Updates the username of a user.
+        /// </summary>
+        /// <param name="id">The user ID.</param>
+        /// <param name="newUserNameDto">The new username Data Transfer Object.</param>
+        /// <returns>The updated user.</returns>
+        [HttpPut("{id}/change-username")]
+        public async Task<ActionResult<UserDto>> ChangeUserName(int id, [FromBody] NewUserDto newUserNameDto)
+        {
+            var user = await _userService.GetByIdAsync(id);
+
+            // Verify current username
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Check if new username is unique
+            if (!await _userService.IsUserNameUniqueAsync(newUserNameDto.NewUserName))
+            {
+                return BadRequest("Username is already in use.");
+            }
+
+            var updatedUser = await _userService.UpdateUserNameAsync(id, newUserNameDto);
+            return Ok(updatedUser);
+        }
+
+        /// <summary>
+        /// Post the profile picture URL of a user.
+        /// </summary>
+        /// <param name="id">The user ID.</param>
+        /// <param name="newProfilePictureDto">The new profile picture as a base64 encoded string from the Data Transfer Object.</param>
+        /// <returns>The new information of the user.</returns>
+        [HttpPut("{id}/change-profile-picture")]
+        public async Task<ActionResult<UserDto>> ChangeProfilePicture(int id,[FromBody] NewUserDto newProfilePictureDto)
+        {
+            var user = await _userService.GetByIdAsync(id);
+
+            // Verify username
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var updatedUser = await _userService.UpdateProfilePictureAsync(id, newProfilePictureDto);
+            return Ok(updatedUser);
+        }
+
+        /// <summary>
+        /// Updates the status of a user.
+        /// </summary>
+        /// <param name="id">The user ID.</param>
+        /// <param name="newStatus">The new status.</param>
+        /// <returns>The updated user.</returns>
+        [HttpPut("{id}/change-status")]
+        public async Task<ActionResult<UserDto>> ChangeUserStatus(int id, [FromBody] bool newStatus)
+        {
+            var user = await _userService.GetByIdAsync(id);
+
+            // Verify username
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var updatedUser = await _userService.UpdateUserStatusAsync(id, newStatus);
+            return Ok(updatedUser);
+        }
+
+        /// <summary>
+        /// Gets the profile picture URL of a user.
+        /// </summary>
+        /// <param name="id">The user ID.</param>
+        /// <returns>The updated user.</returns>
+        [HttpGet("{id}/get-profile-picture")]
+        public async Task<ActionResult<string>> GetProfilePicture(int id)
+        {
+            var user = await _userService.GetByIdAsync(id);
+                // Verify user
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var profilePicture = await _userService.GetUserProfilePictureAsync(user.Id);
+            if (profilePicture is not null){
+                return Ok(profilePicture);
+            } else{
+                return NotFound();
+            }
+        } 
+
     }
 
     /// <summary>

@@ -1,126 +1,181 @@
 <div class="register-container">
   <div class="register-card">
     <div class="register-header">
-      <h2>Create Account</h2>
-      <p>Join us today! Create your account to get started.</p>
+      <h2>{{'AUTH.REGISTER' | translate }}</h2>
+      <p>{{'AUTH.CREATE_ACCOUNT_MESSAGE' | translate }}</p>
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
       <div class="form-row">
         <div class="form-group">
-          <label for="userName">Username *</label>
+          <label for="userName">{{'AUTH.USERNAME' | translate }} *</label>
           <input
             type="text"
             id="userName"
             formControlName="userName"
             class="form-control"
-            [class.is-invalid]="isFieldInvalid('userName')"
-            placeholder="Enter username"
+            [class.is-invalid]="isFieldRequired('userName') || isFieldUnderMinLength('userName') || isFieldOverMaxLength('userName') || isFieldPatternMismatch('userName')"
+            placeholder= "{{'USERS.USERNAME_PLACEHOLDER' | translate}}"
           />
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('userName')">
-            {{ getFieldError('userName') }}
-          </div>
+          @if(isFieldRequired('userName')){
+            <div class="invalid-feedback">
+              {{ 'AUTH.USERNAME_REQUIRED' | translate }}
+            </div>
+          } @else if(isFieldUnderMinLength('userName')){
+            <div class="invalid-feedback">
+              {{ 'USERS.USERNAME_MIN_LENGTH' | translate }}
+            </div>
+          } @else if(isFieldOverMaxLength('userName')){
+            <div class="invalid-feedback">
+              {{ 'USERS.USERNAME_MAX_LENGTH' | translate }}
+            </div>
+          } @else if(isFieldPatternMismatch('userName')){
+            <div class="invalid-feedback">
+              {{ 'COMMON.INVALID_FORMAT' | translate }}
+            </div>
+          }
         </div>
 
         <div class="form-group">
-          <label for="email">Email *</label>
+          <label for="email">{{'AUTH.EMAIL' | translate }} *</label>
           <input
             type="email"
             id="email"
             formControlName="email"
             class="form-control"
-            [class.is-invalid]="isFieldInvalid('email')"
-            placeholder="Enter email address"
+            [class.is-invalid]="isFieldRequired('email') || isFieldNotEmail('email') || isFieldOverMaxLength('email')"
+            placeholder="{{'USERS.EMAIL_PLACEHOLDER' | translate}}"
           />
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
-            {{ getFieldError('email') }}
+          @if(isFieldRequired('email')){
+          <div class="invalid-feedback">
+            {{ 'AUTH.EMAIL_REQUIRED' | translate }}
           </div>
+          } @else if(isFieldNotEmail('email')){
+          <div class="invalid-feedback">
+            {{ 'AUTH.EMAIL_INVALID' | translate }}
+          </div>
+          } @else if(isFieldOverMaxLength('email')){
+          <div class="invalid-feedback">
+            {{ 'USERS.EMAIL_MAX_LENGTH' | translate }}
+          </div>
+          }
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="firstName">First Name</label>
+          <label for="firstName">{{'AUTH.FIRST_NAME' | translate }}</label>
           <input
             type="text"
             id="firstName"
             formControlName="firstName"
             class="form-control"
-            [class.is-invalid]="isFieldInvalid('firstName')"
-            placeholder="Enter first name"
+            [class.is-invalid]="isFieldOverMaxLength('firstName')"
+            placeholder="{{'USERS.FIRST_NAME_PLACEHOLDER' | translate}}"
           />
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('firstName')">
-            {{ getFieldError('firstName') }}
+          @if(isFieldOverMaxLength('firstName')){
+          <div class="invalid-feedback">
+            {{'USERS.FIRST_NAME_MAX_LENGTH' | translate}}
           </div>
+          }
         </div>
 
         <div class="form-group">
-          <label for="lastName">Last Name</label>
+          <label for="lastName">{{'AUTH.LAST_NAME' | translate }}</label>
           <input
             type="text"
             id="lastName"
             formControlName="lastName"
             class="form-control"
-            [class.is-invalid]="isFieldInvalid('lastName')"
-            placeholder="Enter last name"
+            [class.is-invalid]="isFieldOverMaxLength('lastName')"
+            placeholder="{{'USERS.LAST_NAME_PLACEHOLDER' | translate}}"
           />
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('lastName')">
-            {{ getFieldError('lastName') }}
+          @if(isFieldOverMaxLength('lastName')){
+          <div class="invalid-feedback">
+            {{'USERS.LAST_NAME_MAX_LENGTH' | translate}}
           </div>
+          }
         </div>
       </div>
 
       <div class="form-group">
-        <label for="password">Password *</label>
+        <label for="password">{{'AUTH.PASSWORD' | translate }} *</label>
         <input
           type="password"
           id="password"
           formControlName="password"
           class="form-control"
-          [class.is-invalid]="isFieldInvalid('password')"
-          placeholder="Enter password"
+          [class.is-invalid]="isFieldRequired('password') || isFieldUnderMinLength('password') || isFieldOverMaxLength('password') || isFieldPatternMismatch('password')"
+          placeholder="{{ 'USERS.PASSWORD_PLACEHOLDER' | translate }}"
         />
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
-          {{ getFieldError('password') }}
-        </div>
+        @if(isFieldRequired('password')){
+          <div class="invalid-feedback">
+            {{ 'AUTH.PASSWORD_REQUIRED' | translate }}
+          </div>
+        } @else if(isFieldUnderMinLength('password')){
+          <div class="invalid-feedback">
+            {{ 'USERS.PASSWORD_MIN_LENGTH' | translate }}
+          </div>
+        } @else if(isFieldOverMaxLength('password')){
+          <div class="invalid-feedback">
+            {{ 'USERS.PASSWORD_MAX_LENGTH' | translate }}
+          </div>
+        } @else if(isFieldPatternMismatch('password')){
+          <div class="invalid-feedback">
+            {{ 'USERS.PASSWORD_PATTERN' | translate }}
+          </div>
+        } 
         <small class="form-text text-muted">
-          Password must be at least 8 characters with uppercase, lowercase, number, and special character.
+          {{ 'MESSAGES.PASSWORD_INSTRUCTIONS' | translate }}
         </small>
       </div>
 
       <div class="form-group">
-        <label for="confirmPassword">Confirm Password *</label>
+        <label for="confirmPassword">{{'AUTH.CONFIRM_PASSWORD' | translate }} *</label>
         <input
           type="password"
           id="confirmPassword"
           formControlName="confirmPassword"
           class="form-control"
-          [class.is-invalid]="isFieldInvalid('confirmPassword') || hasPasswordMismatch()"
-          placeholder="Confirm password"
+          [class.is-invalid]="isFieldRequired('confirmPassword') || hasPasswordMismatch()"
+          placeholder="{{ 'uSERS.CONFIRM_PASSWORD_PLACEHOLDER' | translate }}"
         />
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('confirmPassword') || hasPasswordMismatch()">
-          {{ getFieldError('confirmPassword') }}
-        </div>
+        @if(isFieldRequired('confirmPassword')){
+          <div class="invalid-feedback">
+            {{ 'AUTH.CONFIRM_PASSWORD_REQUIRED' | translate}}
+          </div>
+        }@else if(hasPasswordMismatch()){
+          <div class="invalid-feedback">
+            {{'AUTH.PASSWORD_MISMATCH' | translate }}
+          </div>
+        }
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
+      @if(errorMessage){
+        <div class="error-message">
+          {{'AUTH.REGISTRATION_ERROR' | translate }}
+        </div>
+      }
 
       <button
         type="submit"
         class="btn btn-primary btn-block"
         [disabled]="loading"
       >
-        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-        {{ loading ? 'Creating Account...' : 'Create Account' }}
+        @if(loading){
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          {{ 'AUTH.WAIT' | translate }}
+        } @else {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          {{'AUTH.REGISTER' | translate }}
+        }
       </button>
     </form>
 
     <div class="register-footer">
       <p>
-        Already have an account? 
-        <a routerLink="/auth/login" class="link">Sign in here</a>
+        {{ 'AUTH.ALREADY_HAVE_ACCOUNT' | translate}}
+        <a routerLink="/auth/login" class="link">{{ 'AUTH.LOGIN' | translate}}</a>
       </p>
     </div>
   </div>

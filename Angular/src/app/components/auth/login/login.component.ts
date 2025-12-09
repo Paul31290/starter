@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../services/auth.service';
 import { LoginRequest } from '../../../models/auth.model';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -25,13 +26,14 @@ import { LoginRequest } from '../../../models/auth.model';
     MatButtonModule,
     MatCheckboxModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslateModule
   ]
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading = false;
-  errorMessage = '';
+  errorMessage = false;
   returnUrl = '';
 
   constructor(
@@ -41,8 +43,8 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.loginForm = this.formBuilder.group({
-      usernameOrEmail: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      usernameOrEmail: ['', [Validators.required]],
+      password: ['', [Validators.required]],
       rememberMe: [false]
     });
   }
@@ -58,7 +60,7 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loading = true;
-      this.errorMessage = '';
+      this.errorMessage = false;
 
       const loginRequest: LoginRequest = {
         usernameOrEmail: this.loginForm.value.usernameOrEmail,
@@ -73,7 +75,7 @@ export class LoginComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.errorMessage = error.error?.message || 'Login failed. Please check your credentials.';
+          this.errorMessage = true;
         }
       });
     } else {
@@ -86,27 +88,6 @@ export class LoginComponent implements OnInit {
       const control = this.loginForm.get(key);
       control?.markAsTouched();
     });
-  }
-
-  getFieldError(fieldName: string): string {
-    const control = this.loginForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required.`;
-      }
-      if (control.errors['minlength']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['minlength'].requiredLength} characters.`;
-      }
-    }
-    return '';
-  }
-
-  private getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
-      'usernameOrEmail': 'Username or Email',
-      'password': 'Password'
-    };
-    return labels[fieldName] || fieldName;
   }
 
   isFieldInvalid(fieldName: string): boolean {

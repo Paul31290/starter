@@ -107,7 +107,7 @@ namespace StarterTemplate.Application.Services
         public async Task<bool> SendPasswordResetEmailAsync(string to, string resetToken, string userName)
         {
             var subject = "Password Reset Request";
-            var resetUrl = $"{_emailSettings.BaseUrl}/reset-password?token={resetToken}";
+            var resetUrl = $"{_emailSettings.BaseUrl}/auth/reset-password?token={resetToken}";
             
             var body = new StringBuilder();
             body.AppendLine("<html><body>");

@@ -10,7 +10,7 @@ import { User } from '../models/user.model';
 })
 export class UserService extends GenericCrudService<User> {
   constructor(http: HttpClient) {
-    super(http, 'users');
+    super(http, 'Users');
   }
 
   getUsersByRole(role: string, params?: PaginationParams): Observable<PaginatedResponse<User>> {
@@ -29,7 +29,7 @@ export class UserService extends GenericCrudService<User> {
   }
 
   getUserByEmail(email: string): Observable<User> {
-    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/by-email/${email}`)
+    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/email/${email}`)
       .pipe(
         map(response => response.data),
         catchError(this.handleError.bind(this))
@@ -37,7 +37,7 @@ export class UserService extends GenericCrudService<User> {
   }
 
   getUserByUsername(username: string): Observable<User> {
-    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/by-username/${username}`)
+    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/username/${username}`)
       .pipe(
         map(response => response.data),
         catchError(this.handleError.bind(this))
@@ -60,8 +60,8 @@ export class UserService extends GenericCrudService<User> {
       );
   }
 
-  changePassword(userId: number, currentPassword: string, newPassword: string): Observable<boolean> {
-    return this.http.post<ApiResponse<boolean>>(`${this.baseUrl}/${userId}/change-password`, {
+  changePassword(userId: number, currentPassword: string, newPassword: string): Observable<User> {
+    return this.http.post<ApiResponse<User>>(`${this.baseUrl}/${userId}/change-password`, {
       currentPassword,
       newPassword
     })

@@ -9,6 +9,7 @@ using StarterTemplate.Application.Interfaces;
 using StarterTemplate.Domain.Entities;
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace StarterTemplate.Application.Services
 {
@@ -22,6 +23,7 @@ namespace StarterTemplate.Application.Services
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly JwtSettingsDto _jwtSettings;
         private readonly IStarterTemplateContext _context;
+        private readonly EmailService _emailService;
 
         /// <summary>
         /// Initializes a new instance of the JwtAuthService class.
@@ -34,12 +36,14 @@ namespace StarterTemplate.Application.Services
             IUserRepository userRepository,
             IUserRoleRepository userRoleRepository,
             IOptions<JwtSettingsDto> jwtSettings,
-            IStarterTemplateContext context)
+            IStarterTemplateContext context,
+            EmailService emailService)
         {
             _userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
             _jwtSettings = jwtSettings.Value;
             _context = context;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -370,6 +374,69 @@ namespace StarterTemplate.Application.Services
 
             _context.RefreshTokens.Add(refreshTokenEntity);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Sends a password reset link to the specified email address.
+        /// </summary>
+        /// <param name="email">The email address of the user requesting the password reset.</param>
+        /// <returns>A task that represents the asynchronous operation, with a boolean result indicating success or failure.</returns>
+        public async Task<bool> SendPasswordResetLinkAsync(string email)
+        {
+            // Try to find the user by their email address
+            var user = await _userRepository.GetByEmailAsync(email);
+            // Security measure: 
+            // Do not reveal whether the user exists or not — 
+            // always behave the same if the user is not found or the email is not confirmed
+            if (user == null)
+                return false;
+            // Get user roles
+            var userRoles = await _userRoleRepository.GetByUserIdAsync(user.Id);
+            var roles = userRoles.Where(ur => ur.Role != null).Select(ur => ur.Role!.Name).ToList();
+
+            // Generate a unique, secure token for password reset
+            var token = GenerateAccessToken(user.Id, user.UserName, user.Email, roles);
+            // Send the reset link via email to the user
+            await _emailService.SendPasswordResetEmailAsync(user.Email, token, user.UserName);
+            return true;
+        }
+        /// <summary>
+        /// Resets the user's password using the provided reset token and new password.
+        /// </summary>
+        /// <param name="resetPasswordDto">The DTO containing the reset password information.</param>
+        /// <returns>A task that represents the asynchronous operation, with a ValidationResultDto indicating success or failure.</returns>
+        public async Task<ValidationResultDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+
+            var failed = new ValidationResultDto { IsValid = false };
+
+            if (resetPasswordDto == null || string.IsNullOrWhiteSpace(resetPasswordDto.Email) || string.IsNullOrWhiteSpace(resetPasswordDto.Token) || string.IsNullOrWhiteSpace(resetPasswordDto.Password) || string.IsNullOrWhiteSpace(resetPasswordDto.ConfirmPassword))
+            {
+                return failed;
+            }
+            // Try to find the user by their email address
+            var user = await _userRepository.GetByEmailAsync(resetPasswordDto.Email);
+
+            // If user not found, return a generic failure (no details leaked for security)
+            if (user == null)
+                return failed;
+
+            // Decode the token that was passed in from the reset link
+            var decodedBytes = WebEncoders.Base64UrlDecode(resetPasswordDto.Token);
+            var decodedToken = Encoding.UTF8.GetString(decodedBytes);
+            
+            // Validate the token as a JWT
+            var principal = await ValidateTokenAsync(decodedToken);
+            if (principal == null)
+                return failed;
+
+            // Hash and set the new password
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.Password);
+            var updated = _userRepository.UpdateAsync(user);
+            if (updated != null)
+                return new ValidationResultDto { IsValid = true };
+
+            return failed;
         }
     }
 }

@@ -33,8 +33,24 @@ export const routes: Routes = [
         path: "register",
         loadComponent: () =>
           import("./components/auth/register/register.component").then((c) => c.RegisterComponent),
+      },
+      {
+        path: "forgot-password",
+        loadComponent: () =>
+          import("./components/auth/forgot-password/forgot-password.component").then((c) => c.ForgotPasswordComponent),
+      },
+      {
+        path: "reset-password",
+        loadComponent: () =>
+          import("./components/auth/reset-password/reset-password.component").then((c) => c.ResetPasswordComponent),
       }
     ]
+  },
+  {
+    path: "settings",
+    loadComponent: () =>
+      import("./components/settings/settings.component").then((c) => c.SettingsComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: "unauthorized",

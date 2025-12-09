@@ -195,6 +195,101 @@ namespace StarterTemplate.Application.Services
         }
 
         /// <summary>
+        /// Gets all roles assigned to a specific user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <returns>A collection of roles assigned to the user.</returns>
+        public async Task<string?> GetUserProfilePictureAsync(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                {
+                    return "No profile picture found for this user";
+                }
+            return user.ProfilePicture;
+        }
+
+        /// <summary>
+        /// Update the profile picture of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <param name="newProfilePictureDto">The new profile picture as a base64 encoded string from the Data Transfer Object.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        public async Task<bool> UpdateProfilePictureAsync(int userId, NewUserDto newProfilePictureDto)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.ProfilePicture = newProfilePictureDto.NewProfilePicture;
+                _userRepository.UpdateAsync(user);
+                await _userRepository.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Update the username of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <param name="newUserNameDto">The new username Data Transfer Object.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        public async Task<bool> UpdateUserNameAsync(int userId, NewUserDto newUserNameDto )
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.UserName = newUserNameDto.NewUserName;
+                _userRepository.UpdateAsync(user);
+                await _userRepository.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Update the status of a user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <param name="newStatus">The new status.</param>
+        /// <returns>True if successful; otherwise, false.</returns>
+        public async Task<bool> UpdateUserStatusAsync(int userId, bool newStatus)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.IsActive = newStatus;
+                _userRepository.UpdateAsync(user);
+                await _userRepository.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Provides a function to include navigation properties specific to user queries.
         /// </summary>
         /// <returns>A function that modifies a query to include user-specific navigation properties.</returns>

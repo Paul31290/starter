@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../services/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 import { RegisterRequest } from '../../../models/auth.model';
 
 @Component({
@@ -23,13 +24,14 @@ import { RegisterRequest } from '../../../models/auth.model';
     MatInputModule,
     MatButtonModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslateModule
   ]
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   loading = false;
-  errorMessage = '';
+  errorMessage = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -80,7 +82,7 @@ export class RegisterComponent implements OnInit {
   onSubmit(): void {
     if (this.registerForm.valid) {
       this.loading = true;
-      this.errorMessage = '';
+      this.errorMessage = false;
 
       const registerRequest: RegisterRequest = {
         userName: this.registerForm.value.userName,
@@ -98,7 +100,7 @@ export class RegisterComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+          this.errorMessage = true;
         }
       });
     } else {
@@ -113,51 +115,54 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  getFieldError(fieldName: string): string {
+  isFieldRequired(fieldName: string): boolean {
     const control = this.registerForm.get(fieldName);
     if (control?.errors && control.touched) {
       if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required.`;
-      }
-      if (control.errors['minlength']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['minlength'].requiredLength} characters.`;
-      }
-      if (control.errors['maxlength']) {
-        return `${this.getFieldLabel(fieldName)} cannot exceed ${control.errors['maxlength'].requiredLength} characters.`;
-      }
-      if (control.errors['email']) {
-        return 'Please enter a valid email address.';
-      }
-      if (control.errors['pattern']) {
-        if (fieldName === 'userName') {
-          return 'Username can only contain letters, numbers, and underscores.';
-        }
-        if (fieldName === 'password') {
-          return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.';
-        }
-      }
-      if (control.errors['passwordMismatch']) {
-        return 'Passwords do not match.';
+        return !!(control?.invalid && control.touched);;
       }
     }
-    return '';
+    return false;
   }
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
-      'userName': 'Username',
-      'email': 'Email',
-      'password': 'Password',
-      'confirmPassword': 'Confirm Password',
-      'firstName': 'First Name',
-      'lastName': 'Last Name'
-    };
-    return labels[fieldName] || fieldName;
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
+  isFieldUnderMinLength(fieldName: string): boolean {
     const control = this.registerForm.get(fieldName);
-    return !!(control?.invalid && control.touched);
+    if (control?.errors && control.touched) {
+      if (control.errors['minlength']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
+
+  isFieldOverMaxLength(fieldName: string): boolean {
+    const control = this.registerForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['maxlength']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
+
+  isFieldNotEmail(fieldName: string): boolean {
+    const control = this.registerForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['email']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
+  }
+
+  isFieldPatternMismatch(fieldName: string): boolean {
+    const control = this.registerForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['pattern']) {
+        return !!(control?.invalid && control.touched);;
+      }
+    }
+    return false;
   }
 
   hasPasswordMismatch(): boolean {

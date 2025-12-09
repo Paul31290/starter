@@ -1,39 +1,43 @@
 <div class="login-container">
   <div class="login-card">
     <div class="login-header">
-      <h2>Sign In</h2>
-      <p>Welcome back! Please sign in to your account.</p>
+      <h2>{{ 'AUTH.LOGIN' | translate}}</h2>
+      <p> {{ 'AUTH.WELCOME_BACK' | translate}} </p>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-group">
-        <label for="usernameOrEmail">Username or Email</label>
+        <label for="usernameOrEmail"> {{ 'AUTH.USERNAME_OR_EMAIL' | translate}} </label>
         <input
           type="text"
           id="usernameOrEmail"
           formControlName="usernameOrEmail"
           class="form-control"
           [class.is-invalid]="isFieldInvalid('usernameOrEmail')"
-          placeholder="Enter your username or email"
+          placeholder="{{ 'USERS.USERNAME_OR_EMAIL_PLACEHOLDER' | translate }}"
         />
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('usernameOrEmail')">
-          {{ getFieldError('usernameOrEmail') }}
-        </div>
+        @if(isFieldInvalid('usernameOrEmail')){
+          <div class="invalid-feedback">
+            {{ 'USERS.USERNAME_OR_EMAIL_REQUIRED' | translate }}
+          </div>
+        }
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password"> {{ 'AUTH.PASSWORD' | translate}} </label>
         <input
           type="password"
           id="password"
           formControlName="password"
           class="form-control"
           [class.is-invalid]="isFieldInvalid('password')"
-          placeholder="Enter your password"
+          placeholder="{{ 'USERS.PASSWORD_PLACEHOLDER' | translate }}"
         />
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
-          {{ getFieldError('password') }}
-        </div>
+        @if(isFieldInvalid('password')){
+          <div class="invalid-feedback">
+            {{'AUTH.PASSWORD_REQUIRED' | translate}}
+          </div>
+        }
       </div>
 
       <div class="form-group">
@@ -45,30 +49,40 @@
             class="form-check-input"
           />
           <label for="rememberMe" class="form-check-label">
-            Remember me
+            {{ 'AUTH.REMEMBER_ME' | translate}}
           </label>
         </div>
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
+      @if(errorMessage){
+        <div class="error-message">
+            {{ 'AUTH.LOGIN_ERROR' | translate }} : {{ 'AUTH.INVALID_CREDENTIALS' | translate }} 
+        </div>
+      }
 
       <button
         type="submit"
         class="btn btn-primary btn-block"
         [disabled]="loading"
       >
-        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-        {{ loading ? 'Signing in...' : 'Sign In' }}
+      @if (loading) {
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        {{ 'AUTH.WAIT' | translate }}
+      } @else {
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        {{ 'AUTH.LOGIN' | translate }}
+      }
       </button>
     </form>
 
     <div class="login-footer">
       <p>
-        Don't have an account? 
-        <a routerLink="/auth/register" class="link">Sign up here</a>
+        {{ 'AUTH.DONT_HAVE_ACCOUNT' | translate}}
+        <a routerLink="/auth/register" class="link"> {{ 'AUTH.SIGNUP' | translate}} </a>
       </p>
-    </div>
+      <br>
+      <p>
+        <a [routerLink]="['/auth/forgot-password']" class="link"> {{ 'AUTH.FORGOT_PASSWORD' | translate }} </a>
+      </p>
   </div>
 </div>
